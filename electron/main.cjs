@@ -1,6 +1,6 @@
 // Windows desktop shell for CodeQuest. Serves the built web app (dist-desktop)
 // from a private app:// origin so localStorage (your progress) persists in
-// %APPDATA%\CodeQuest Desktop between runs.
+// %APPDATA%\codequest between runs.
 const { app, BrowserWindow, Menu, net, protocol, shell } = require('electron');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');

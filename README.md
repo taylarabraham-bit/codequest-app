@@ -48,7 +48,7 @@ There's no iPhone or Mac version.
 2. Double-click it. It can take several seconds to open while it unpacks itself.
 3. If Windows says *"Windows protected your PC"*, click **More info**, then **Run anyway**. This appears because the app isn't code-signed.
 
-To update, download the newer `.exe`. Your progress is kept in `%APPDATA%\CodeQuest Desktop`. To remove the app, delete the `.exe` and that folder.
+To update, download the newer `.exe`. Your progress is kept in `%APPDATA%\codequest`. To remove the app, delete the `.exe` and that folder.
 
 ### Android
 
