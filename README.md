@@ -1,105 +1,182 @@
-# CodeQuest
+<p align="center">
+  <img src="docs/images/banner.png" alt="CodeQuest: learn to code in two-minute bites. Tracks: HTML, CSS, C#, ASP.NET, Blazor, Docker and Ollama." width="100%">
+</p>
 
-A bite-size coding game that comes in two editions:
+<p align="center">
+  <a href="https://github.com/taylarabraham-bit/codequest-app/releases/latest"><img src="https://img.shields.io/badge/Download_for_Windows-.exe-2f81f7?style=for-the-badge&logo=windows&logoColor=white" alt="Download for Windows"></a>
+  <a href="https://github.com/taylarabraham-bit/codequest-app/releases/latest"><img src="https://img.shields.io/badge/Download_for_Android-.apk-3fb950?style=for-the-badge&logo=android&logoColor=white" alt="Download for Android"></a>
+</p>
 
-- **Desktop (Windows .exe):** the advanced, keyboard-first edition for laptops. Every answer is typed in a Codecademy-style three-pane screen, and tool tours let you practise in mock versions of the real apps.
-- **Mobile (Android APK):** the original tap-to-answer phone game.
+<p align="center">
+  <a href="https://github.com/taylarabraham-bit/codequest-app/releases/latest"><img src="https://img.shields.io/github/v/release/taylarabraham-bit/codequest-app?label=latest&color=3fb950" alt="Latest release"></a>
+  <a href="https://github.com/taylarabraham-bit/codequest-app/actions/workflows/release.yml"><img src="https://img.shields.io/github/actions/workflow/status/taylarabraham-bit/codequest-app/release.yml?branch=main&label=build" alt="Build status"></a>
+  <img src="https://img.shields.io/badge/accounts-none-a371f7" alt="No accounts">
+  <img src="https://img.shields.io/badge/works-offline-58a6ff" alt="Works offline">
+</p>
 
-It works like Codecademy, only faster. There are seven tracks, each with 20 units that run from beginner to job-ready and end in a capstone project:
+<h3 align="center">Stop watching tutorials. Type real code, get instant feedback, and level up.</h3>
 
-| Track | Units | Covers |
+<p align="center">
+  <img src="docs/images/hero.png" alt="CodeQuest running on a laptop and a phone" width="100%">
+</p>
+
+CodeQuest is a coding game with lessons short enough to fit between other things. You read one idea, then practise it straight away, earning XP, streaks and badges as you go. No account, no setup and no extra tools to install: download it and start your first lesson.
+
+<table>
+  <tr>
+    <td align="center" width="25%"><h2>7</h2>tracks</td>
+    <td align="center" width="25%"><h2>141</h2>units</td>
+    <td align="center" width="25%"><h2>705</h2>lessons</td>
+    <td align="center" width="25%"><h2>7,755</h2>exercises</td>
+  </tr>
+</table>
+
+## Get started
+
+| | Windows laptop | Android phone |
 |---|---|---|
-| HTML | 20 | Structure, forms, accessibility, SEO, SVG, shadow DOM, email HTML |
-| CSS | 20 | Layout, responsive design, animation, cascade layers, color, anchor positioning |
-| C# | 21 | The language from variables to generics, reflection, memory and parallelism |
-| ASP.NET | 20 | Minimal APIs, EF Core, auth, SignalR, gRPC, observability, Aspire |
-| Blazor | 20 | Components, forms, render modes, QuickGrid, PWAs, MAUI Hybrid |
-| Docker | 20 | Images, Compose, security, CI/CD, dev containers, Kubernetes |
-| Ollama | 20 | Local models, the REST API, RAG, tools and agents, production, security |
+| **Edition** | Desktop: type every answer | Mobile: tap to answer |
+| **File** | `CodeQuest-Desktop-N.exe` (about 110 MB) | `codequest-N.apk` (about 4 MB) |
+| **Needs** | 64-bit Windows | Android 7 or newer |
+| **Installing** | None: it runs from the file | Allow one install from your browser |
 
+There's no iPhone or Mac version.
 
-- **Short lessons:** each lesson is about 2 minutes. You read one concept card, then do 7 hands-on exercises.
-- **Five exercise types:** fill in the blank, build the code from tokens, put lines in order, find and fix the bug, and type a short line. Each unit starts easy and gets harder toward the end.
-- **Live preview** for HTML and CSS, and **console output** for C# and the other code tracks.
-- **Mistakes:** a wrong answer gets you a hint. A second miss shows the answer with an explanation, and the exercise goes into your **review queue** (spaced over 1, 3 and 7 days).
-- **Game layer:** XP and levels, a daily streak and daily goal, 29 badges, and a **boss** at the end of every unit.
-- **Final exams and certificates:** clear every unit in a track to unlock a 20-question final exam. Get 17 right to earn that track's certificate.
-- **Skip-ahead tests:** get 7 of 8 right to jump past units you already know.
-- **Getting started:** a short intro on first launch, then a **Continue** button on the home screen that picks up where you left off.
-- **Settings:** sound, vibration, daily goal, reduce motion and larger code text, all in Profile.
-- **Saving:** progress is stored only on your device. There are no accounts and nothing is uploaded.
+### Windows
+
+1. Open the [latest release](https://github.com/taylarabraham-bit/codequest-app/releases/latest) and download `CodeQuest-Desktop-N.exe`.
+2. Double-click it. It can take several seconds to open while it unpacks itself.
+3. If Windows says *"Windows protected your PC"*, click **More info**, then **Run anyway**. This appears because the app isn't code-signed.
+
+To update, download the newer `.exe`. Your progress is kept in `%APPDATA%\CodeQuest Desktop`. To remove the app, delete the `.exe` and that folder.
+
+### Android
+
+1. On your phone, open the [latest release](https://github.com/taylarabraham-bit/codequest-app/releases/latest) and download `codequest-N.apk`.
+2. Open the download. The first time, Android asks you to allow installs from your browser: turn on **Allow from this source**.
+3. Tap **Install**.
+
+To update, install a newer APK over the old one. Your progress is kept.
+
+## What you'll learn
+
+Every track runs from beginner to job-ready and ends in a capstone project.
+
+<p align="center">
+  <img src="docs/images/tracks.png" alt="Seven tracks: HTML, CSS, C#, ASP.NET, Blazor, Docker and Ollama, with 141 units in total" width="100%">
+</p>
+
+## How it plays
+
+| | |
+|---|---|
+| **Learn one idea** | Each lesson takes about 2 minutes: one concept card, then 7 hands-on exercises. |
+| **Practise five ways** | Fill in the blank, build the code, put lines in order, find and fix the bug, and type a line. Each unit starts easy and gets harder. |
+| **See it work** | HTML and CSS render in a live preview, and the other tracks show the program's output. |
+| **Learn from mistakes** | A wrong answer gets a hint. A second miss shows the answer and explains it, then adds the question to a review queue spaced over 1, 3 and 7 days. |
+| **Beat the boss** | Every unit ends with a 10-question boss. |
+| **Earn your certificate** | Clear a track to unlock its 20-question final exam. Get 17 right to earn the certificate. |
+| **Skip what you know** | Get 7 of 8 right on a skip-ahead test to jump past units. |
 
 ## Desktop edition
 
-| | Mobile (Android) | Desktop (Windows) |
-|---|---|---|
-| Answering | Tap tokens, chips and lines | **Type everything**: blanks, whole lines, fixes; reorder lines with Alt+↑/↓ |
-| Lessons | 7 exercises | The same 7, typed, plus **2 write-the-code challenges** per lesson: write several lines in a real editor against a task checklist (1,410 in total) |
-| Lesson screen | One column | **Instructions \| Code \| Output** panes, resizable |
-| Code pane | Plain code block | Styled like the real tool: **VS Code** (HTML, CSS, Docker, Ollama files), **Visual Studio** (C#, ASP.NET, Blazor), a **PowerShell terminal** for `docker`/`ollama`/`dotnet` commands |
-| Output pane | Preview or console under the code | A **browser window** with the live page, or the **console** the program prints to |
-| Extras | | **Tool tours**: click-through practice on mock VS Code, Visual Studio, browser DevTools, Docker Desktop and Windows Terminal, plus typed CLI walkthroughs (2 per track) |
-| Keys | | Ctrl+Enter check / continue, Esc quit, Tab between blanks |
+Built for a keyboard, with screens styled like the tools you'll use on the job.
 
-Content, XP, streaks, reviews, bosses, exams and certificates are the same in both. Progress is stored on each device separately (on Windows in `%APPDATA%\CodeQuest Desktop`).
+<p align="center">
+  <img src="docs/images/lesson-csharp.png" alt="A C# challenge styled like Visual Studio, with instructions, code and console output" width="100%">
+  <br><em>Write the code against a task checklist, then see what it prints.</em>
+</p>
 
-## Install on Windows
+<table>
+  <tr>
+    <td width="50%"><img src="docs/images/lesson-docker.png" alt="A Docker lesson with a PowerShell terminal"><p align="center"><em>Practise commands at a PowerShell prompt</em></p></td>
+    <td width="50%"><img src="docs/images/tour-docker.png" alt="A tool tour on a mock of Docker Desktop"><p align="center"><em>Tool tour: find your way around Docker Desktop</em></p></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/images/tour-visual-studio.png" alt="A tool tour on a mock of Visual Studio"><p align="center"><em>Tool tour: run and debug in Visual Studio</em></p></td>
+    <td width="50%"><img src="docs/images/home.png" alt="The home screen with XP, daily goal and all seven tracks"><p align="center"><em>Pick up where you left off</em></p></td>
+  </tr>
+</table>
 
-Every push to `main` also builds a portable Windows app and attaches it to the same GitHub Release as the APK.
+- **Three-pane lessons:** resizable Instructions, Code and Output panes.
+- **Write-the-code challenges:** 1,410 extra challenges, 2 per lesson, written in an editor against a task checklist.
+- **14 tool tours:** click-through practice on mock versions of VS Code, Visual Studio, browser DevTools, Docker Desktop and Windows Terminal, plus typed command walkthroughs.
+- **Windows commands:** command lessons use Windows PowerShell.
+- **Keyboard first:** `Ctrl+Enter` to check and continue, `Esc` to quit, `Tab` between blanks, `Alt+↑/↓` to reorder lines.
 
-1. On the laptop, open **github.com/taylarabraham-bit/codequest-app/releases**.
-2. Download the newest `CodeQuest-Desktop-N.exe`.
-3. Double-click it. There's nothing to install and no admin rights are needed. The first time, SmartScreen may say *"Windows protected your PC"* because the app isn't code-signed: click **More info → Run anyway**.
-4. To update, download the newer .exe. Your progress is kept.
+You don't need Docker, .NET or Ollama installed. The editors and terminals are built into the app, and it checks your answers itself.
 
-## Install on your phone
+## Mobile edition
 
-Every push to `main` builds a new APK and publishes it as a GitHub Release.
+The same lessons, made for one thumb.
 
-1. On your Android phone, open **github.com/taylarabraham-bit/codequest-app/releases**.
-2. Tap the newest release's `codequest-N.apk` to download it.
-3. Open the download. The first time, Android asks you to allow installs from your browser: turn on **Allow from this source**.
-4. Tap **Install**. A newer APK installs over the old one and your progress is kept.
+<table>
+  <tr>
+    <td align="center" width="33%"><img src="docs/images/phone-home.png" alt="Phone home screen with tracks" width="260"><br><em>Choose a track</em></td>
+    <td align="center" width="33%"><img src="docs/images/phone-map.png" alt="Phone lesson map with a boss at the end of the unit" width="260"><br><em>Work up to the boss</em></td>
+    <td align="center" width="33%"><img src="docs/images/phone-lesson.png" alt="A phone exercise with a live result" width="260"><br><em>Tap, check, repeat</em></td>
+  </tr>
+</table>
 
-## Develop
+## Keep your streak going
+
+<p align="center">
+  <img src="docs/images/profile.png" alt="The profile screen with stats and 29 badges" width="100%">
+</p>
+
+XP and levels, a daily streak, a daily goal you set yourself, 29 badges to collect, and settings for sound, vibration, reduced motion and larger code text.
+
+## Private by design
+
+There are no accounts, ads or analytics, and the app doesn't send your data anywhere. Your progress stays on your device, so each device keeps its own.
+
+## For developers
+
+Built with React, TypeScript and Vite, packaged with Electron for Windows and Capacitor for Android. You'll need Node 22 or newer.
 
 ```bash
+git clone https://github.com/taylarabraham-bit/codequest-app.git
+cd codequest-app
 npm install
-npm run dev          # http://127.0.0.1:5180 (use the browser's phone view)
-npm run dev:desktop  # http://127.0.0.1:5181, the desktop edition in a browser
+```
+
+```bash
+npm run dev          # phone edition at http://127.0.0.1:5180
+npm run dev:desktop  # desktop edition at http://127.0.0.1:5181
 npm run app          # build the desktop edition and open it in Electron
-npm run dist:win     # build the portable .exe into release/ (best run on Windows; CI does this)
+npm run dist:win     # build the portable .exe into release/
+```
+
+```bash
 npm test             # engine tests and validation of every exercise
 npm run lint && npm run typecheck
 RUN_DOTNET=1 npx vitest run tests/csharp-run.test.ts   # needs the .NET 10 SDK: runs every C# exercise
 ```
 
-Browser smoke test (run it with the dev server up):
+<details>
+<summary><strong>Browser playthrough tests</strong></summary>
+
+Run these with the matching dev server up. Set `CHROMIUM=/path/to/chromium` to use a browser you already have.
 
 ```bash
-node scripts/smoke.mjs shots          # plays HTML lesson 1, checks progress is saved
-ALL=1 node scripts/smoke.mjs shots    # plays EVERY lesson, boss and unlocked final exam through the UI
-ALL=1 TRACKS=docker,ollama node scripts/smoke.mjs shots   # just some tracks
-# set CHROMIUM=/path/to/chromium to use a preinstalled browser
-# URL=... points it at another server. For long runs, test a frozen build so
-# file edits don't reload the page mid-run:
-#   NODE_ENV=development npx vite build --mode development --outDir dist-smoke
-#   npx vite preview --outDir dist-smoke --port 5190 &
-#   URL=http://127.0.0.1:5190/ ALL=1 node scripts/smoke.mjs shots
-```
-
-Desktop smoke test (run it with `npm run dev:desktop` up): types every answer at laptop size, plays a lesson and a tool tour in every track, and checks progress is saved.
-
-```bash
-node scripts/smoke-desktop.mjs shots-desktop
+node scripts/smoke.mjs shots                  # plays HTML lesson 1 on the phone edition
+ALL=1 node scripts/smoke.mjs shots            # plays every lesson, boss and unlocked exam
+node scripts/smoke-desktop.mjs shots-desktop  # types answers at laptop size in every track
 ALL=1 node scripts/smoke-desktop.mjs shots-desktop   # every lesson, boss, exam and tour, by typing
+ALL=1 TRACKS=docker,ollama node scripts/smoke.mjs shots   # just some tracks
 ```
 
-## Adding lessons
+</details>
 
-The map shows the full roadmap from `src/content/roadmap.ts`. Units that aren't written yet show as "coming soon". To add one, create `src/content/<track>/unitNN.ts` following [docs/CONTENT_GUIDE.md](docs/CONTENT_GUIDE.md); the game picks it up automatically. `npm test` checks every exercise's shape, the difficulty ramp, and that each answer actually passes the checker (tapped on mobile and typed on desktop). Tool tours live in `src/content/tours/`; see the guide.
+<details>
+<summary><strong>Adding lessons</strong></summary>
 
-## How it fits together
+Create `src/content/<track>/unitNN.ts` following the [content guide](docs/CONTENT_GUIDE.md), and the game picks it up automatically. `npm test` checks every exercise's shape, the difficulty ramp, and that each answer passes the checker, both tapped and typed. Tool tours live in `src/content/tours/`.
+
+</details>
+
+<details>
+<summary><strong>How it fits together</strong></summary>
 
 | Path | What |
 |---|---|
@@ -107,14 +184,16 @@ The map shows the full roadmap from `src/content/roadmap.ts`. Units that aren't 
 | `src/engine/check.ts` | Answer checking, tokenizing, previews |
 | `src/engine/progress.ts` | XP, levels, streaks, unlocks, badges, review queue (pure functions) |
 | `src/screens/Session.tsx` | The lesson, boss, review and skip-test runner |
-| `src/components/exercises/` | The five exercise widgets (tap versions); `desktop/` holds the typed versions |
-| `src/screens/sessionRunner.ts` | The check/hint/reveal loop shared by both editions |
-| `src/screens/desktop/` | Desktop shell (sidebar), the 3-pane lesson screen, the tool-tour screen |
-| `src/components/desktop/` | Tool-styled editor frames, mock terminal, output windows, and the tour mock screens (`mocks/`) |
+| `src/screens/sessionRunner.ts` | The check, hint and reveal loop shared by both editions |
+| `src/components/exercises/` | The exercise widgets; `desktop/` holds the typed versions |
+| `src/screens/desktop/` | Desktop shell, three-pane lesson screen, tool-tour screen |
+| `src/components/desktop/` | Tool-styled editor frames, mock terminal, output windows and tour mocks |
 | `src/content/tours/` | Tool tours, per track |
-| `src/edition.ts` | `DESKTOP` flag: set by `vite --mode desktop` (`.env.desktop`) |
+| `src/edition.ts` | `DESKTOP` flag, set by `vite --mode desktop` |
 | `electron/main.cjs` | Electron shell for the Windows app |
 | `android/` | Capacitor Android wrapper |
-| `.github/workflows/release.yml` | Builds the APK and the Windows .exe on every push to `main` and publishes both |
+| `.github/workflows/release.yml` | Builds and publishes the APK and the `.exe` on every push to `main` |
 
 CI signs the APK with a key held in GitHub secrets, so every build can update the installed app. Without the key, `assembleRelease` produces an unsigned APK.
+
+</details>
