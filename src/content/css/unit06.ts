@@ -1,0 +1,535 @@
+import type { Unit } from '../../engine/types';
+
+// Pastel cells so the grid's columns and rows show up in the preview.
+const tints = ['#fde', '#def', '#dfe', '#fec', '#edf', '#eee'];
+const cells = (labels: string[], cls = '') =>
+  labels
+    .map((t, i) => `<div${cls && ` class="${cls}"`} style="background:${tints[i % tints.length]};padding:6px">${t}</div>`)
+    .join('');
+// One highlighted item, e.g. the one the learner places.
+const item = (cls: string, text: string) => `<div class="${cls}" style="background:#9cf;padding:6px">${text}</div>`;
+// An item already placed in a named area.
+const area = (name: string, text: string, bg = '#eee') =>
+  `<div style="grid-area:${name};background:${bg};padding:6px">${text}</div>`;
+const grid3 = 'display:grid;grid-template-columns:repeat(3,1fr);gap:4px';
+
+// .promo covers columns 2 and 3 of a 3-column grid: every way to say it in one line.
+const promoAccept = ['2 / 4', '2 / -1', '2 / span 2', '-3 / 4', '-3 / -1', '-3 / span 2', 'span 2 / 4', 'span 2 / -1'].flatMap(
+  (v) => [`grid-column: ${v};`, `grid-column: ${v}`],
+);
+
+const unit: Unit = {
+  title: 'Grid',
+  blurb: 'Lay out rows and columns at once with CSS Grid.',
+  lessons: [
+    {
+      title: 'Grid columns',
+      concept: {
+        body: 'display: grid turns a box into a grid, and its children fill the cells row by row. grid-template-columns gives one size per column. The fr unit shares out the leftover space, so 200px 1fr is a fixed column plus one that fills the rest.',
+        code: '.page {\n  display: grid;\n  grid-template-columns: 200px 1fr;\n}',
+      },
+      exercises: [
+        {
+          kind: 'fill',
+          prompt: 'Turn the gallery into a grid.',
+          code: '.gallery {\n  display: ___;\n  grid-template-columns: 100px 100px;\n}',
+          blanks: [{ answer: ['grid'], options: ['grid', 'flex', 'block'] }],
+          hint: 'Which layout does grid-template-columns belong to?',
+          explain: 'grid-template-columns is ignored unless the box is display: grid. Then the photos fill two 100px columns, row by row.',
+          preview: { html: `<div class="gallery">${cells(['🌅', '🏔️', '🌊', '🌲'])}</div>` },
+        },
+        {
+          kind: 'fill',
+          prompt: 'Turn the photo container into a two-column grid.',
+          code: '___ {\n  display: grid;\n  grid-template-columns: 1fr 1fr;\n}',
+          blanks: [{ answer: ['.photos'], options: ['.photos', '.photo', '.photos .photo'] }],
+          hint: 'Which box holds the others?',
+          explain: 'display: grid goes on the container; its direct children become the grid items.',
+          preview: { html: `<div class="photos">${cells(['Beach', 'Forest', 'Lake', 'Dunes'], 'photo')}</div>` },
+        },
+        {
+          kind: 'fill',
+          prompt: 'Make the second column fill the rest of the space.',
+          code: '.profile {\n  display: grid;\n  grid-template-columns: 120px ___;\n}',
+          blanks: [{ answer: ['1fr'], options: ['1fr', '100%', 'rest'] }],
+          hint: 'Use the unit that shares out leftover space.',
+          explain: '1fr takes whatever is left after the 120px column. 100% would be the whole width and spill out of the box.',
+          preview: { html: `<div class="profile">${cells(['🧑‍🚀', 'Nova, level 7 pilot'])}</div>` },
+        },
+        {
+          kind: 'build',
+          prompt: 'Make .board a grid with two equal columns.',
+          answer: ['.board', '{', 'display:', 'grid;', 'grid-template-columns:', '1fr', '1fr;', '}'],
+          alt: [['.board', '{', 'grid-template-columns:', '1fr', '1fr;', 'display:', 'grid;', '}']],
+          distractors: ['flex;', '1fr,'],
+          hint: 'Two declarations: the display, then one fr per column.',
+          explain: 'Two 1fr columns split the space evenly. Column sizes are separated by spaces, never commas.',
+          preview: { html: `<div class="board">${cells(['♜', '♞', '♝', '♛'])}</div>` },
+        },
+        {
+          kind: 'fill',
+          prompt: 'Make the second column twice as wide as the first.',
+          code: '.recipe {\n  display: grid;\n  grid-template-columns: 1fr ___;\n}',
+          blanks: [{ answer: ['2fr'], options: ['2fr', '2', '200%'] }],
+          hint: 'Think in shares of the leftover space.',
+          explain: 'The space is cut into 3 shares: 1fr gets one and 2fr gets two.',
+          preview: { html: `<div class="recipe">${cells(['Ingredients', 'Method'])}</div>` },
+        },
+        {
+          kind: 'build',
+          prompt: 'Three columns: 80px, the rest, then 80px.',
+          answer: ['.player', '{', 'grid-template-columns:', '80px', '1fr', '80px;', '}'],
+          distractors: ['grid-columns:', '1fr;'],
+          hint: 'List the three sizes left to right, with spaces between.',
+          explain: 'The two 80px sides stay fixed; the 1fr middle gets everything left over.',
+          preview: { html: `<div class="player" style="display:grid">${cells(['⏮', 'Now playing: Lo-fi beats', '⏭'])}</div>` },
+        },
+        {
+          kind: 'fill',
+          prompt: 'How wide is the 1fr column?',
+          code: '.box {\n  width: 300px;\n  display: grid;\n  grid-template-columns: 100px 1fr;\n}\n/* 1fr column: ___px */',
+          blanks: [{ answer: ['200'], options: ['200', '300', '100'] }],
+          hint: 'Take the fixed column away from the total.',
+          explain: '300 − 100 = 200px is left over, and the only fr column takes all of it.',
+          preview: { html: `<div class="box">${cells(['100px', '1fr'])}</div>` },
+        },
+      ],
+    },
+    {
+      title: 'Repeat and rows',
+      concept: {
+        body: 'repeat(3, 1fr) is short for 1fr 1fr 1fr. grid-template-rows sizes rows the same way columns are sized. row-gap and column-gap add space between rows and between columns, never around the outside; gap: 8px 16px sets both, rows first.',
+        code: '.grid {\n  grid-template-columns: repeat(3, 1fr);\n  grid-template-rows: 80px 40px;\n  row-gap: 8px;\n  column-gap: 16px;\n}',
+      },
+      exercises: [
+        {
+          kind: 'fill',
+          prompt: 'Make four equal columns.',
+          code: '.keys {\n  display: grid;\n  grid-template-columns: repeat(___, 1fr);\n}',
+          blanks: [{ answer: ['4'], options: ['4', '4fr', 'four'] }],
+          hint: 'The first argument is a plain count.',
+          explain: 'repeat(4, 1fr) writes 1fr four times: four equal columns.',
+          preview: { html: `<div class="keys">${cells(['7', '8', '9', '÷', '4', '5', '6', '×'])}</div>` },
+        },
+        {
+          kind: 'fill',
+          prompt: 'Put 12px of space between the rows.',
+          code: '.inbox {\n  display: grid;\n  ___: 12px;\n}',
+          blanks: [{ answer: ['row-gap'], options: ['row-gap', 'column-gap', 'padding'] }],
+          hint: 'padding adds space at the edges, not between items.',
+          explain: 'row-gap spaces the rows apart without adding space above the first or below the last.',
+          preview: { html: `<div class="inbox">${cells(['📩 Rent reminder', '📩 Pizza deal', '📩 Team lunch'])}</div>` },
+        },
+        {
+          kind: 'build',
+          prompt: 'Write 1fr 1fr 1fr the short way.',
+          answer: ['.stats', '{', 'grid-template-columns:', 'repeat(3,', '1fr);', '}'],
+          distractors: ['repeat(1fr,', '3);'],
+          hint: 'How many first, then what size.',
+          explain: 'repeat() takes the count first, then the size to repeat.',
+          preview: { html: `<div class="stats" style="display:grid;gap:4px">${cells(['HP 80', 'MP 40', 'XP 1200'])}</div>` },
+        },
+        {
+          kind: 'fill',
+          prompt: 'Make row 1 40px tall and row 2 80px tall.',
+          code: '.week {\n  display: grid;\n  grid-template-columns: 1fr 1fr;\n  grid-template-___: 40px 80px;\n}',
+          blanks: [{ answer: ['rows'], options: ['rows', 'columns', 'areas'] }],
+          hint: 'The columns are already set. What else has a size?',
+          explain: 'grid-template-rows lists row heights from top to bottom, just as columns list widths.',
+          preview: { html: `<div class="week">${cells(['Mon', 'Tue', 'Gym', 'Swim'])}</div>` },
+        },
+        {
+          kind: 'fill',
+          prompt: 'Pick the value that makes 100px 1fr 100px 1fr.',
+          code: '.form {\n  display: grid;\n  grid-template-columns: repeat(2, ___);\n}',
+          blanks: [{ answer: ['100px 1fr'], options: ['100px 1fr', '100px, 1fr', '200px 2fr'] }],
+          hint: 'repeat() copies everything after the comma, as a group.',
+          explain: 'repeat(2, 100px 1fr) repeats the pair: label, field, label, field.',
+          preview: { html: `<div class="form">${cells(['Name', 'Ada', 'City', 'Leeds'])}</div>` },
+        },
+        {
+          kind: 'build',
+          prompt: '10px between rows, 20px between columns.',
+          answer: ['.tiles', '{', 'row-gap:', '10px;', 'column-gap:', '20px;', '}'],
+          alt: [['.tiles', '{', 'column-gap:', '20px;', 'row-gap:', '10px;', '}']],
+          distractors: ['gap-row:', 'grid-row:'],
+          hint: 'Two declarations, each named after what it separates.',
+          explain: 'row-gap sets the space between rows; column-gap sets the space between columns.',
+          preview: {
+            html: `<div class="tiles" style="display:grid;grid-template-columns:repeat(3,1fr)">${cells(['🍎', '🍌', '🍒', '🥝', '🍑', '🍐'])}</div>`,
+          },
+        },
+        {
+          kind: 'fill',
+          prompt: 'How wide is each column?',
+          code: '.strip {\n  width: 300px;\n  display: grid;\n  grid-template-columns: repeat(3, 1fr);\n  column-gap: 15px;\n}\n/* Each column: ___px */',
+          blanks: [{ answer: ['90'], options: ['90', '100', '80'] }],
+          hint: 'Gaps sit only between columns. How many are there?',
+          explain: '3 columns have 2 gaps: 300 − 2 × 15 = 270px is shared, so each 1fr is 90px.',
+          preview: { html: `<div class="strip">${cells(['🍓', '🍋', '🍇'])}</div>` },
+        },
+      ],
+    },
+    {
+      title: 'Placing items',
+      concept: {
+        body: 'Grid lines are numbered from 1 at the left and top, so 3 columns have 4 lines. grid-column: 1 / 3 runs from line 1 to line 3, covering two columns; span 2 covers two from wherever the item starts. Negative numbers count back from the end, so 1 / -1 spans all the columns.',
+        code: '.hero { grid-column: 1 / -1; }\n.wide { grid-column: span 2; }\n.ad { grid-column: 2 / span 2; }\n.tall { grid-row: 1 / 3; }',
+      },
+      exercises: [
+        {
+          kind: 'fill',
+          prompt: 'Cover columns 1 and 2.',
+          code: '.header {\n  grid-column: 1 / ___;\n}',
+          blanks: [{ answer: ['3'], options: ['3', '2', '4'] }],
+          hint: 'Count lines, not columns.',
+          explain: 'Column 2 ends at line 3, so 1 / 3 covers columns 1 and 2.',
+          preview: { html: `<div style="${grid3}">${item('header', 'Dino Dash')}${cells(['🏆', 'Play', 'Shop', 'Help'])}</div>` },
+        },
+        {
+          kind: 'build',
+          prompt: 'Make .feature span two columns.',
+          answer: ['.feature', '{', 'grid-column:', 'span', '2;', '}'],
+          distractors: ['span-2;', 'grid-span:'],
+          hint: 'A keyword, a space, then the count.',
+          explain: 'span 2 stretches the item over two columns from wherever it lands.',
+          preview: {
+            html: `<div style="${grid3}">${cells(['Soup'])}${item('feature', '⭐ Chef’s special: ramen')}${cells(['Salad', 'Tacos', 'Pie'])}</div>`,
+          },
+        },
+        {
+          kind: 'build',
+          prompt: 'Stretch .footer across every column.',
+          answer: ['.footer', '{', 'grid-column:', '1', '/', '-1;', '}'],
+          distractors: ['0;', '100%;'],
+          hint: 'Count the end line backwards from the far edge.',
+          explain: '-1 is the last line, so 1 / -1 reaches the far edge however many columns there are.',
+          preview: { html: `<div style="${grid3}">${cells(['Docs', 'Blog', 'Jobs'])}${item('footer', '© 2026 Pixel Forge')}</div>` },
+        },
+        {
+          kind: 'fill',
+          prompt: 'Type the keyword: cover 3 columns from where it lands.',
+          code: '.panorama {\n  grid-column: ___ 3;\n}',
+          blanks: [{ answer: ['span'] }],
+          hint: 'It counts columns, not lines.',
+          explain: 'span 3 makes the item three columns wide, starting wherever it would normally land.',
+          preview: {
+            html: `<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px">${cells(['🏠'])}${item('panorama', '🌄 Valley at dawn')}${cells(['🐐', '🌼', '🦅'])}</div>`,
+          },
+        },
+        {
+          kind: 'order',
+          prompt: 'Columns on .menu first, then stretch .title across them.',
+          lines: ['.menu {', '  grid-template-columns: repeat(3, 1fr);', '}', '.title {', '  grid-column: 1 / -1;', '}'],
+          hint: 'Each rule opens with its selector and closes with }.',
+          explain: 'The menu gets three columns, and 1 / -1 runs the title from the first line to the last.',
+          preview: {
+            html: `<div class="menu" style="display:grid;gap:4px">${item('title', 'Today’s specials')}${cells(['Pho', 'Dal', 'Paella'])}</div>`,
+          },
+        },
+        {
+          kind: 'fix',
+          prompt: 'The header should cover all 3 columns. Fix it.',
+          code: '.page {\n  grid-template-columns: repeat(3, 1fr);\n}\n.header {\n  grid-column: 1 / [[3]];\n}',
+          fix: '4',
+          options: ['4', '2', '0'],
+          hint: 'There is a line on both sides of every column.',
+          explain: 'Line 3 is where column 3 starts, so 1 / 3 stops short. The far edge is line 4, or -1.',
+          preview: {
+            html: `<div class="page" style="display:grid;gap:4px">${item('header', 'Weather: Oslo')}${cells(['Mon ☀️', 'Tue 🌧️', 'Wed ⛅'])}</div>`,
+          },
+        },
+        {
+          kind: 'build',
+          prompt: 'Start .ad at row line 2 and span 2 rows.',
+          answer: ['.ad', '{', 'grid-row:', '2', '/', 'span', '2;', '}'],
+          distractors: ['grid-column:', '3;'],
+          hint: 'Start line, a slash, then the span.',
+          explain: 'grid-row: 2 / span 2 starts at line 2 and ends two rows later, at line 4.',
+          preview: {
+            html: `<div style="${grid3}">${cells(['News', 'Sport', 'Tech', 'Food', 'Travel', 'Music', 'Art'])}<div class="ad" style="grid-column:3;background:#9cf;padding:6px">AD</div></div>`,
+          },
+        },
+      ],
+    },
+    {
+      title: 'Named areas',
+      concept: {
+        body: 'grid-template-areas draws the layout as strings: one string per row, one name per cell, and every row needs the same number of cells. Repeat a name to stretch an area, or write . for an empty cell. Then grid-area: head (no quotes) drops an item into the head area.',
+        code: '.page {\n  grid-template-areas:\n    "head head"\n    "side main";\n}\nheader { grid-area: head; }',
+      },
+      exercises: [
+        {
+          kind: 'fill',
+          prompt: 'Put the header in the head area.',
+          code: '.page {\n  display: grid;\n  grid-template-areas:\n    "head head"\n    "side main";\n}\nheader { ___: head; }',
+          blanks: [{ answer: ['grid-area'], options: ['grid-area', 'grid-template-areas', 'area'] }],
+          hint: 'The container draws the areas; the item picks one.',
+          explain: 'grid-area: head places the header in the cells named head, so it spans both columns.',
+          preview: {
+            html: `<div class="page" style="gap:4px"><header style="background:#9cf;padding:6px">Trail Notes</header>${area('side', 'Tags')}${area('main', 'Day 1: the ridge')}</div>`,
+          },
+        },
+        {
+          kind: 'build',
+          prompt: 'Place the footer in the foot area.',
+          answer: ['footer', '{', 'grid-area:', 'foot;', '}'],
+          distractors: ['"foot";', '.foot;'],
+          hint: 'Area names are plain words, like class names without the dot.',
+          explain: 'grid-area takes the bare name. Quotes belong only in grid-template-areas.',
+          preview: {
+            html: `<div style="display:grid;grid-template-areas:'main side' 'foot foot';gap:4px">${area('main', 'Photos', '#def')}${area('side', 'Info', '#dfe')}<footer style="background:#9cf;padding:6px">© 2026 Trail Club</footer></div>`,
+          },
+        },
+        {
+          kind: 'fill',
+          prompt: 'Type the name so head spans both columns.',
+          code: '.page {\n  display: grid;\n  grid-template-areas:\n    "head ___"\n    "side main";\n}',
+          blanks: [{ answer: ['head'] }],
+          hint: 'Repeat a name to stretch its area.',
+          explain: 'Writing head twice in the first row makes one area two cells wide.',
+          preview: {
+            html: `<div class="page" style="gap:4px">${area('head', 'Cookbook', '#9cf')}${area('side', 'Index', '#fde')}${area('main', 'Pancakes', '#def')}</div>`,
+          },
+        },
+        {
+          kind: 'order',
+          prompt: 'Header row on top, footer row at the bottom.',
+          lines: ['.page {', '  grid-template-areas:', '    "head head"', '    "side main"', '    "foot foot";', '}'],
+          hint: 'The strings go top row to bottom row; only the last one gets the ;.',
+          explain: 'Each string is one row, read top to bottom, and the whole list is one declaration.',
+          preview: {
+            html: `<div class="page" style="display:grid;gap:4px">${area('head', 'Podcast HQ', '#9cf')}${area('side', 'Episodes', '#fde')}${area('main', 'Ep. 42: Grids', '#def')}${area('foot', 'Subscribe', '#fec')}</div>`,
+          },
+        },
+        {
+          kind: 'build',
+          prompt: 'Row 1: empty cell, then head. Row 2: side, main.',
+          answer: ['.page', '{', 'grid-template-areas:', '". head"', '"side main";', '}'],
+          distractors: ['". head",', '". head";'],
+          hint: 'A dot is an empty cell. Strings sit side by side with no commas.',
+          explain: 'The . leaves the top-left cell empty. The row strings are separated by spaces, and the ; comes once, at the end.',
+          preview: {
+            html: `<div class="page" style="display:grid;gap:4px">${area('head', 'Inbox', '#9cf')}${area('side', '📁', '#fde')}${area('main', '3 unread messages', '#def')}</div>`,
+          },
+        },
+        {
+          kind: 'fill',
+          prompt: 'Type the area that fills the whole second row.',
+          code: '.home {\n  display: grid;\n  grid-template-areas:\n    "logo nav"\n    "hero hero";\n}\n.banner { grid-area: ___; }',
+          blanks: [{ answer: ['hero'] }],
+          hint: 'Read the second string.',
+          explain: 'hero appears in both cells of row 2, so grid-area: hero spans the full width.',
+          preview: {
+            html: `<div class="home" style="gap:4px">${area('logo', '🚲 Spokes', '#fde')}${area('nav', 'Shop · Repairs', '#def')}${item('banner', 'Spring tune-up: 20% off')}</div>`,
+          },
+        },
+        {
+          kind: 'fix',
+          prompt: 'The layout falls apart. Fix the second row.',
+          code: '.page {\n  display: grid;\n  grid-template-areas:\n    "head head"\n    [["main"]];\n}',
+          fix: '"side main"',
+          options: ['"side main"', '"side, main"', 'side main'],
+          hint: 'Count the cells in each row.',
+          explain: 'Every row needs the same number of cells. One name under a two-cell row makes the whole declaration invalid.',
+          preview: {
+            html: `<div class="page" style="gap:4px">${area('head', 'Weather', '#9cf')}${area('side', 'Cities', '#fde')}${area('main', 'Lisbon 24°', '#def')}</div>`,
+          },
+        },
+      ],
+    },
+    {
+      title: 'Auto-fit and minmax',
+      concept: {
+        body: 'minmax(200px, 1fr) takes a minimum then a maximum: at least 200px, growing to share the space (the minimum can’t be fr). repeat(auto-fit, minmax(200px, 1fr)) fits as many of those columns as there is room for. auto-fill does the same but keeps empty columns, so a few items stay narrow instead of stretching.',
+        code: '.cards {\n  display: grid;\n  grid-template-columns:\n    repeat(auto-fit, minmax(200px, 1fr));\n  gap: 16px;\n}',
+      },
+      exercises: [
+        {
+          kind: 'fill',
+          prompt: 'Fit as many 120px+ columns as the width allows.',
+          code: '.apps {\n  display: grid;\n  grid-template-columns: repeat(___, minmax(120px, 1fr));\n}',
+          blanks: [{ answer: ['auto-fit'], options: ['auto-fit', 'auto', 'fit'] }],
+          hint: 'Plain auto isn’t allowed as a repeat() count.',
+          explain: 'auto-fit counts how many 120px columns fit and makes that many.',
+          preview: { html: `<div class="apps">${cells(['📷 Camera', '🗺️ Maps', '🎵 Music', '📝 Notes', '⏰ Clock'])}</div>` },
+        },
+        {
+          kind: 'fill',
+          prompt: 'Cards at least 100px, growing to share the row.',
+          code: '.cards {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, ___(100px, 1fr));\n}',
+          blanks: [{ answer: ['minmax'], options: ['minmax', 'minimum', 'range'] }],
+          hint: 'The function takes a smallest and a largest size.',
+          explain: 'minmax(100px, 1fr) never shrinks below 100px but grows to share the leftover space.',
+          preview: { html: `<div class="cards">${cells(['Mars', 'Venus', 'Jupiter', 'Saturn'])}</div>` },
+        },
+        {
+          kind: 'build',
+          prompt: 'Auto-fit columns: at least 150px, sharing the space.',
+          answer: ['.shop', '{', 'grid-template-columns:', 'repeat(auto-fit,', 'minmax(150px,', '1fr));', '}'],
+          distractors: ['minmax(1fr,', '150px));'],
+          hint: 'minmax() takes the minimum first.',
+          explain: 'repeat(auto-fit, minmax(150px, 1fr)) adds a column whenever another 150px fits.',
+          preview: {
+            html: `<div class="shop" style="display:grid;gap:6px">${cells(['👟 Sneakers', '🧢 Caps', '🧦 Socks', '🎒 Bags'])}</div>`,
+          },
+        },
+        {
+          kind: 'order',
+          prompt: 'Rebuild the auto-fit gallery rule.',
+          lines: ['.gallery {', '  grid-template-columns: repeat(', '    auto-fit,', '    minmax(100px, 1fr)', '  );', '}'],
+          hint: 'repeat( how many, what size ).',
+          explain: 'repeat() takes the count, auto-fit, then the size to repeat, minmax(100px, 1fr).',
+          preview: {
+            html: `<div class="gallery" style="display:grid;gap:4px">${cells(['🐱', '🐶', '🐰', '🦊', '🐼'])}</div>`,
+          },
+        },
+        {
+          kind: 'fix',
+          prompt: 'The cards stack in one column. Fix the size.',
+          code: '.cards {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, [[1fr]]);\n}',
+          fix: 'minmax(120px, 1fr)',
+          options: ['minmax(120px, 1fr)', 'minmax(1fr, 120px)', 'auto'],
+          hint: 'auto-fit needs a minimum width to count how many columns fit.',
+          explain: 'auto-fit only works with a fixed minimum. 1fr alone has none, so the declaration is dropped and the grid falls back to one column.',
+          preview: { html: `<div class="cards">${cells(['Rome', 'Kyoto', 'Lima', 'Cairo'])}</div>` },
+        },
+        {
+          kind: 'type',
+          prompt: 'Type it: auto-fit columns, at least 80px, sharing the space.',
+          template: '.tags {\n  display: grid;\n  grid-template-columns: ___;\n}',
+          accept: ['repeat(auto-fit, minmax(80px, 1fr))', 'repeat(auto-fit, minmax(80px, 1fr));'],
+          hint: 'repeat(), then auto-fit, then minmax() with the minimum first.',
+          explain: 'Each tag column is at least 80px; when another 80px fits, a new column appears.',
+          preview: { html: `<div class="tags">${cells(['#css', '#grid', '#html', '#web', '#ux', '#a11y'])}</div>` },
+        },
+        {
+          kind: 'fill',
+          prompt: 'Stretch the two cards across the whole row.',
+          code: '.duo {\n  display: grid;\n  grid-template-columns: repeat(___, minmax(90px, 1fr));\n}',
+          blanks: [{ answer: ['auto-fit'], options: ['auto-fit', 'auto-fill'] }],
+          hint: 'One keyword collapses the empty columns; the other keeps them.',
+          explain: 'auto-fit collapses the empty columns, so the two cards share the full row. auto-fill would keep the empty columns and leave blank space at the end.',
+          preview: { html: `<div class="duo">${cells(['☀️ Day pass', '🌙 Night pass'])}</div>` },
+        },
+      ],
+    },
+  ],
+  boss: [
+    {
+      kind: 'fill',
+      prompt: 'Type the width of the 2fr column.',
+      code: '.row {\n  width: 300px;\n  display: grid;\n  grid-template-columns: 30px 1fr 2fr;\n  column-gap: 15px;\n}\n/* 2fr column: ___px */',
+      blanks: [{ answer: ['160'] }],
+      hint: 'Take away the fixed column and both gaps, then split into 3 shares.',
+      explain: '300 − 30 − 2 × 15 = 240px for 3 shares, so 1fr = 80px and 2fr = 160px.',
+      preview: { html: `<div class="row">${cells(['#1', 'Kai', '9,450 pts'])}</div>` },
+    },
+    {
+      kind: 'build',
+      prompt: '50px time column, then three equal columns, using repeat().',
+      answer: ['.schedule', '{', 'grid-template-columns:', '50px', 'repeat(3,', '1fr);', '}'],
+      distractors: ['50px,', 'repeat(4,'],
+      hint: 'repeat() can sit next to other sizes. No commas between sizes.',
+      explain: '50px repeat(3, 1fr) is the same as 50px 1fr 1fr 1fr.',
+      preview: {
+        html: `<div class="schedule" style="display:grid;gap:4px">${cells(['9:00', 'Yoga', 'Spin', 'Swim', '10:00', 'Boxing', 'Pilates', 'Row'])}</div>`,
+      },
+    },
+    {
+      kind: 'fill',
+      prompt: '20px between rows, 8px between columns, in one line.',
+      code: '.board {\n  display: grid;\n  grid-template-columns: repeat(3, 1fr);\n  gap: ___;\n}',
+      blanks: [{ answer: ['20px 8px'], options: ['20px 8px', '8px 20px', '20px, 8px'] }],
+      hint: 'Which does the gap shorthand set first: rows or columns?',
+      explain: 'gap: 20px 8px is row-gap: 20px plus column-gap: 8px.',
+      preview: { html: `<div class="board">${cells(['❌', '⭕', '❌', '⭕', '❌', '⭕', '❌', '⭕', '❌'])}</div>` },
+    },
+    {
+      kind: 'fix',
+      prompt: 'The footer should span every column. Fix it.',
+      code: '.grid {\n  grid-template-columns: repeat(3, 1fr);\n}\n.footer {\n  grid-column: 1 / [[0]];\n}',
+      fix: '-1',
+      options: ['-1', '3', '100%'],
+      hint: 'Lines start at 1, and there is no line 0.',
+      explain: 'Line 0 doesn’t exist, so the declaration is dropped. -1 is the last line, so 1 / -1 spans every column.',
+      preview: {
+        html: `<div class="grid" style="display:grid;gap:4px">${cells(['Home', 'Menu', 'Book'])}${item('footer', 'Open daily 8–22')}</div>`,
+      },
+    },
+    {
+      kind: 'type',
+      prompt: 'Type the line: .promo covers columns 2 and 3.',
+      template: '.grid {\n  display: grid;\n  grid-template-columns: repeat(3, 1fr);\n}\n.promo {\n  ___\n}',
+      accept: promoAccept,
+      hint: 'Column 3 ends at line 4.',
+      explain: 'grid-column: 2 / 4 runs from line 2 to line 4. 2 / span 2 and 2 / -1 work too.',
+      preview: { html: `<div class="grid">${cells(['🥐'])}${item('promo', '2-for-1 coffee')}${cells(['🍞', '🥯', '🧁'])}</div>` },
+    },
+    {
+      kind: 'order',
+      prompt: 'Head on top, foot at the bottom, then place .menu.',
+      lines: [
+        '.page {',
+        '  grid-template-areas:',
+        '    "head head head"',
+        '    "side main ."',
+        '    "foot foot foot";',
+        '}',
+        '.menu { grid-area: side; }',
+      ],
+      hint: 'Finish the page rule before the .menu rule.',
+      explain: 'Three rows of three cells each, with a . leaving the middle row’s last cell empty. Then .menu drops into side.',
+      preview: {
+        html: `<div class="page" style="display:grid;gap:4px">${item('menu', 'Menu')}${area('head', 'The Daily Grid', '#fde')}${area('main', 'Top story', '#def')}${area('foot', 'Contact', '#fec')}</div>`,
+      },
+    },
+    {
+      kind: 'fix',
+      prompt: 'The logo should span the top row. Fix it.',
+      code: '.top {\n  display: grid;\n  grid-template-areas:\n    "logo logo"\n    "search cart";\n}\n.logo {\n  grid-area: [["logo"]];\n}',
+      fix: 'logo',
+      options: ['logo', '.logo', '#logo'],
+      hint: 'Quotes belong in the template, not on the item.',
+      explain: 'grid-area takes a bare name. A quoted string is invalid, so the logo was auto-placed into a single cell instead.',
+      preview: {
+        html: `<div class="top" style="gap:4px">${area('search', '🔍 Search', '#def')}${area('cart', '🛒 2', '#dfe')}${item('logo', '🦉 Owl Books')}</div>`,
+      },
+    },
+    {
+      kind: 'fill',
+      prompt: 'Keep empty columns so the two books stay narrow.',
+      code: '.shelf {\n  display: grid;\n  grid-template-columns: repeat(___, minmax(90px, 1fr));\n}',
+      blanks: [{ answer: ['auto-fill'] }],
+      hint: 'Not the keyword that collapses empty columns.',
+      explain: 'auto-fill keeps the empty columns, so two books stay one column wide instead of stretching across.',
+      preview: { html: `<div class="shelf">${cells(['📕 Dune', '📗 Emma'])}</div>` },
+    },
+    {
+      kind: 'fix',
+      prompt: 'The gallery stacks in one column. Fix the size.',
+      code: '.gallery {\n  display: grid;\n  grid-template-columns: repeat(\n    auto-fit,\n    [[minmax(1fr, 120px)]]\n  );\n}',
+      fix: 'minmax(120px, 1fr)',
+      options: ['minmax(120px, 1fr)', 'minmax(120px 1fr)', 'minmax(120px, 1)'],
+      hint: 'Which comes first in minmax(), and can it be fr?',
+      explain: 'The minimum comes first and can’t be fr, so the old value was invalid. minmax(120px, 1fr) is at least 120px and shares the rest.',
+      preview: { html: `<div class="gallery">${cells(['🖼️ Waves', '🖼️ Iris', '🖼️ Stars', '🖼️ Bridge'])}</div>` },
+    },
+    {
+      kind: 'type',
+      prompt: 'Rows: 50px top, a middle that fills the rest, 30px bottom.',
+      template: '.app {\n  display: grid;\n  ___\n}',
+      accept: [
+        'grid-template-rows: 50px 1fr 30px;',
+        'grid-template-rows: 50px 1fr 30px',
+        'grid-template-rows: 50px auto 30px;',
+        'grid-template-rows: 50px auto 30px',
+      ],
+      hint: 'Like grid-template-columns, but for rows.',
+      explain: 'The 1fr row takes the height left after the 50px and 30px rows.',
+      preview: { html: `<div class="app" style="height:200px;gap:4px">${cells(['🎧 Header', 'Playlist', '▶ Controls'])}</div>` },
+    },
+  ],
+};
+
+export default unit;

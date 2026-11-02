@@ -1,0 +1,500 @@
+import type { Unit } from '../../engine/types';
+
+// A short chat log, taller than its box once a height is set.
+const LOG =
+  '<div class="chat" style="height:90px;border:1px solid #ccc;padding:6px"><p>🧑 Pizza tonight?</p><p>👩 Yes! 7pm?</p><p>🧑 Booked.</p><p>👩 Bring the board games.</p><p>🧑 Catan it is.</p></div>';
+// A table too wide for a phone.
+const WIDE =
+  '<div class="wrap" style="border:1px solid #ccc"><table style="width:520px"><tr><th>Player</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Total</th></tr><tr><td>Ana</td><td>12</td><td>9</td><td>15</td><td>11</td><td>14</td><td>61</td></tr></table></div>';
+// A card whose badge pokes out of the corner.
+const CARD =
+  '<div class="card" style="position:relative;width:180px;height:70px;border:1px solid #ccc;margin:12px"><span style="position:absolute;top:-10px;right:-20px;background:gold;padding:2px 6px">NEW</span>🎧 Headphones</div>';
+// A list that gets a scrollbar.
+const LIST =
+  '<ul class="list" style="height:90px;overflow-y:auto;border:1px solid #ccc;margin:0"><li>Milk</li><li>Eggs</li><li>Bread</li><li>Apples</li><li>Rice</li><li>Beans</li></ul>';
+// A page with a sticky header and in-page links.
+const PAGE =
+  '<header style="position:sticky;top:0;height:40px;background:#222;color:#fff">📚 Docs</header><p><a href="#install">Install</a> · <a href="#faq">FAQ</a></p><div style="height:300px"></div><h2 id="install">Install</h2><div style="height:300px"></div><h2 id="faq">FAQ</h2><div style="height:300px"></div>';
+// A sideways carousel.
+const SLIDES =
+  '<div class="slides" style="display:flex;gap:8px;width:240px"><div class="slide" style="flex:0 0 200px;height:80px;background:#fde">🏖️ Beach</div><div class="slide" style="flex:0 0 200px;height:80px;background:#def">🏔️ Peaks</div><div class="slide" style="flex:0 0 200px;height:80px;background:#efd">🌲 Forest</div></div>';
+// A vertical feed of tall posts.
+const FEED =
+  '<div class="feed" style="height:120px;border:1px solid #ccc"><div class="post" style="height:120px;background:#fde">📸 Post 1</div><div class="post" style="height:120px;background:#def">📸 Post 2</div><div class="post" style="height:120px;background:#efd">📸 Post 3</div></div>';
+// A long page for scroll-driven effects.
+const LONG =
+  '<div class="bar" style="position:fixed;top:0;left:0;right:0;height:6px;background:teal"></div><p>Scroll down…</p><div style="height:400px"></div><div class="card" style="padding:16px;background:#def">🌟 Hello from the middle</div><div style="height:400px"></div>';
+
+const unit: Unit = {
+  title: 'Scrolling & snap',
+  blurb: 'Control overflow, smooth jumps, snapping carousels, sticky bits and scroll-driven animation.',
+  lessons: [
+    {
+      title: 'Overflow per axis',
+      concept: {
+        body: 'overflow-x and overflow-y set each direction on its own. overflow: clip cuts content off like hidden, but the box can’t be scrolled at all, not even by code. scrollbar-gutter: stable reserves the scrollbar’s space so content doesn’t jump when one appears.',
+        code: '.table-wrap { overflow-x: auto; }\n.card { overflow: clip; }\n.list {\n  overflow-y: auto;\n  scrollbar-gutter: stable;\n}',
+      },
+      exercises: [
+        {
+          kind: 'fill',
+          prompt: 'Let the wide table scroll sideways only.',
+          code: '.wrap {\n  ___: auto;\n}',
+          blanks: [{ answer: ['overflow-x'], options: ['overflow-x', 'overflow-y', 'overflow-wrap'] }],
+          hint: 'Sideways is the x axis.',
+          explain: 'overflow-x: auto adds a horizontal scrollbar only when the table is too wide, and the page itself stays put.',
+          preview: { html: WIDE },
+        },
+        {
+          kind: 'fill',
+          prompt: 'Scroll the chat up and down, only when needed.',
+          code: '.chat {\n  overflow-y: ___;\n}',
+          blanks: [{ answer: ['auto'], options: ['auto', 'visible', 'clip'] }],
+          hint: 'Which value shows a scrollbar only when content spills?',
+          explain: 'auto adds a scrollbar once the messages outgrow the 90px box, and none while they fit.',
+          preview: { html: LOG },
+        },
+        {
+          kind: 'build',
+          prompt: 'Clip the card’s overflow with no scrolling at all.',
+          answer: ['.card', '{', 'overflow:', 'clip;', '}'],
+          distractors: ['scroll;', 'visible;'],
+          hint: 'A newer value that clips harder than hidden.',
+          explain: 'clip trims the NEW badge at the card’s edge and never makes the card a scroll container.',
+          preview: { html: CARD },
+        },
+        {
+          kind: 'fill',
+          prompt: 'Which value can still be scrolled by code?',
+          code: '/* overflow: ___ hides the scrollbar,\n   but scripts and focus can still scroll it */',
+          blanks: [{ answer: ['hidden'], options: ['hidden', 'clip'] }],
+          hint: 'One of them still makes a scroll container.',
+          explain: 'hidden only hides the scrollbar: tabbing to a link inside can still scroll the box. clip makes no scroll container at all.',
+        },
+        {
+          kind: 'fill',
+          prompt: 'What does overflow-y really become here?',
+          code: '.box {\n  overflow-x: auto;\n  overflow-y: visible;\n}\n/* overflow-y becomes: ___ */',
+          blanks: [{ answer: ['auto'], options: ['auto', 'visible', 'hidden'] }],
+          hint: 'A box can’t scroll one way and spill freely the other way.',
+          explain: 'Once one axis scrolls, visible on the other axis is turned into auto. Only visible with clip can mix.',
+          preview: { html: '<div class="box" style="height:60px;border:1px solid #ccc"><p style="width:400px">A long line that is far too wide for this box.</p><p>Two</p><p>Three</p></div>' },
+        },
+        {
+          kind: 'build',
+          prompt: 'Reserve the scrollbar’s space on the list.',
+          answer: ['.list', '{', 'scrollbar-gutter:', 'stable;', '}'],
+          distractors: ['scrollbar-width:', 'auto;'],
+          hint: 'The space a scrollbar sits in is its gutter.',
+          explain: 'With a stable gutter, the list keeps the same width whether or not a scrollbar shows, so text doesn’t shift.',
+          preview: { html: LIST },
+        },
+        {
+          kind: 'fill',
+          prompt: 'Reserve a gutter on both sides to stay centered.',
+          code: '.list {\n  overflow-y: auto;\n  scrollbar-gutter: stable ___;\n}',
+          blanks: [{ answer: ['both-edges'], options: ['both-edges', 'both', 'center'] }],
+          hint: 'Two words joined by a hyphen.',
+          explain: 'stable both-edges adds the same empty gutter on the other side, so centered content stays centered.',
+          preview: { html: LIST },
+        },
+      ],
+    },
+    {
+      title: 'Smooth jumps & anchors',
+      concept: {
+        body: 'scroll-behavior: smooth on html makes in-page links glide instead of jump. A sticky header can cover the heading you jumped to: scroll-padding-top on the scroller, or scroll-margin-top on the target, leaves room. Only glide when the user hasn’t asked for reduced motion.',
+        code: 'html {\n  scroll-behavior: smooth;\n  scroll-padding-top: 60px;\n}\nh2 { scroll-margin-top: 1rem; }',
+      },
+      exercises: [
+        {
+          kind: 'fill',
+          prompt: 'Make in-page links glide.',
+          code: 'html {\n  scroll-behavior: ___;\n}',
+          blanks: [{ answer: ['smooth'], options: ['smooth', 'slow', 'auto'] }],
+          hint: 'The opposite of a sudden jump.',
+          explain: 'smooth animates the scroll to the target. auto is the default instant jump.',
+          preview: { html: PAGE },
+        },
+        {
+          kind: 'fill',
+          prompt: 'Leave room for the 40px header, set on the page.',
+          code: 'html {\n  ___: 40px;\n}',
+          blanks: [{ answer: ['scroll-padding-top'], options: ['scroll-padding-top', 'scroll-margin-top', 'padding-top'] }],
+          hint: 'html is the scroll container, and containers get padding.',
+          explain: 'scroll-padding-top shrinks the area targets scroll into, so headings land below the header, not under it.',
+          preview: { html: PAGE },
+        },
+        {
+          kind: 'build',
+          prompt: 'Give each h2 50px of room when jumped to.',
+          answer: ['h2', '{', 'scroll-margin-top:', '50px;', '}'],
+          distractors: ['scroll-padding-top:', 'margin-top:'],
+          hint: 'This time it’s set on the targets, not the scroller.',
+          explain: 'scroll-margin-top adds space above the target only when scrolling to it. The layout itself doesn’t change.',
+          preview: { html: PAGE },
+        },
+        {
+          kind: 'fill',
+          prompt: 'Which one goes on #faq itself?',
+          code: '/* On the target: scroll-___-top */',
+          blanks: [{ answer: ['margin'], options: ['margin', 'padding'] }],
+          hint: 'Like normal boxes: margin is around you, padding is inside a container.',
+          explain: 'scroll-margin goes on the element you scroll to; scroll-padding goes on the box that scrolls.',
+        },
+        {
+          kind: 'build',
+          prompt: 'Glide only if the user is fine with motion.',
+          answer: ['@media', '(prefers-reduced-motion: no-preference)', '{', 'html { scroll-behavior: smooth; }', '}'],
+          distractors: ['(prefers-reduced-motion: reduce)', '(motion: ok)'],
+          hint: 'Match users who have NOT asked for less motion.',
+          explain: 'People who set “reduce motion” keep the instant jump; everyone else gets the glide.',
+          preview: { html: PAGE },
+        },
+        {
+          kind: 'fill',
+          prompt: 'Glide, and clear a 4rem header.',
+          code: 'html {\n  scroll-behavior: ___;\n  scroll-padding-top: ___;\n}',
+          blanks: [
+            { answer: ['smooth'], options: ['smooth', 'auto'] },
+            { answer: ['4rem'], options: ['4rem', '0', '-4rem'] },
+          ],
+          hint: 'The padding should match the header’s height.',
+          explain: 'Matching scroll-padding-top to the header height means every anchor lands just below it.',
+          preview: { html: PAGE },
+        },
+        {
+          kind: 'build',
+          prompt: 'Make the .docs panel scroll, smoothly.',
+          answer: ['.docs', '{', 'overflow-y: auto;', 'scroll-behavior: smooth;', '}'],
+          alt: [['.docs', '{', 'scroll-behavior: smooth;', 'overflow-y: auto;', '}']],
+          distractors: ['scroll-behavior: glide;', 'overflow: clip;'],
+          hint: 'scroll-behavior works on any scroll container, not just html.',
+          explain: 'Links that target something inside .docs now glide within the panel.',
+          preview: { html: '<div class="docs" style="height:80px;border:1px solid #ccc"><a href="#end">Jump to end</a><div style="height:200px"></div><p id="end">The end 🎬</p></div>' },
+        },
+      ],
+    },
+    {
+      title: 'Scroll snap',
+      concept: {
+        body: 'scroll-snap-type on the container turns snapping on: an axis plus mandatory (always land on a snap point) or proximity (only when close). Each child picks its snap point with scroll-snap-align: start, center or end. scroll-snap-stop: always stops a fast swipe from skipping items.',
+        code: '.slides {\n  overflow-x: auto;\n  scroll-snap-type: x mandatory;\n}\n.slide { scroll-snap-align: center; }',
+      },
+      exercises: [
+        {
+          kind: 'build',
+          prompt: 'Snap the carousel sideways, every time.',
+          answer: ['.slides', '{', 'scroll-snap-type:', 'x', 'mandatory;', '}'],
+          distractors: ['y', 'always;'],
+          hint: 'Axis first, then how strict.',
+          explain: 'x mandatory means a sideways scroll always comes to rest on a snap point.',
+          preview: { html: `<style>.slides{overflow-x:auto}.slide{scroll-snap-align:start}</style>${SLIDES}` },
+        },
+        {
+          kind: 'fill',
+          prompt: 'Type the value that centers each slide.',
+          code: '.slides {\n  overflow-x: auto;\n  scroll-snap-type: x mandatory;\n}\n.slide {\n  scroll-snap-align: ___;\n}',
+          blanks: [{ answer: ['center'] }],
+          hint: 'Not start, not end.',
+          explain: 'center lines each slide’s middle up with the middle of the container, so you can peek at both neighbors.',
+          preview: { html: SLIDES },
+        },
+        {
+          kind: 'order',
+          prompt: 'Order: display, overflow, snap type, then the child rule.',
+          lines: ['.slides {', '  display: flex;', '  overflow-x: auto;', '  scroll-snap-type: x mandatory;', '}', '.slide { scroll-snap-align: start; }'],
+          hint: 'The container rule closes before the child rule starts.',
+          explain: 'Snap type goes on the scroller and snap align on each child; you need both for snapping to work.',
+          preview: { html: SLIDES },
+        },
+        {
+          kind: 'fill',
+          prompt: 'Snap only when the scroll stops near a point.',
+          code: '.gallery {\n  overflow-y: auto;\n  scroll-snap-type: y ___;\n}',
+          blanks: [{ answer: ['proximity'], options: ['proximity', 'mandatory', 'near'] }],
+          hint: 'The gentler of the two strictness values.',
+          explain: 'proximity only snaps when you stop close to a point, so long content can still rest anywhere.',
+        },
+        {
+          kind: 'build',
+          prompt: 'Stop a fast swipe from skipping slides.',
+          answer: ['.slide', '{', 'scroll-snap-stop:', 'always;', '}'],
+          distractors: ['normal;', 'scroll-snap-align:'],
+          hint: 'The property is about stopping.',
+          explain: 'always makes the scroll stop at each slide, even after a hard flick. normal lets it fly past.',
+          preview: { html: `<style>.slides{overflow-x:auto;scroll-snap-type:x mandatory}.slide{scroll-snap-align:start}</style>${SLIDES}` },
+        },
+        {
+          kind: 'fix',
+          prompt: 'Snapping is ignored. Fix the axis.',
+          code: '.slides {\n  overflow-x: auto;\n  scroll-snap-type: [[horizontal]] mandatory;\n}',
+          fix: 'x',
+          options: ['x', 'y', 'left'],
+          hint: 'Axes have one-letter names.',
+          explain: 'The axis is x, y, block, inline or both. horizontal isn’t a keyword, so the whole declaration is dropped.',
+          preview: { html: `<style>.slide{scroll-snap-align:start}</style>${SLIDES}` },
+        },
+        {
+          kind: 'fill',
+          prompt: 'Type the axis for a vertical feed.',
+          code: '.feed {\n  overflow-y: auto;\n  scroll-snap-type: ___ mandatory;\n}\n.post { scroll-snap-align: start; }',
+          blanks: [{ answer: ['y', 'block'] }],
+          hint: 'Up and down is the other letter.',
+          explain: 'y mandatory makes each post snap to the top of the feed, like a short-video app.',
+          preview: { html: FEED },
+        },
+      ],
+    },
+    {
+      title: 'Sticky & scrollbars',
+      concept: {
+        body: 'A sticky box needs an offset like top: 0, and it only sticks while its parent is on screen. If an ancestor has overflow hidden or auto, it sticks inside that box instead, which often looks broken; clip doesn’t do this. overscroll-behavior: contain keeps a panel’s scroll from dragging the page, and scrollbar-width and scrollbar-color restyle the bar.',
+        code: 'thead th { position: sticky; top: 0; }\n.drawer {\n  overflow-y: auto;\n  overscroll-behavior: contain;\n  scrollbar-width: thin;\n  scrollbar-color: teal #eee;\n}',
+      },
+      exercises: [
+        {
+          kind: 'build',
+          prompt: 'Keep table headers stuck to the top.',
+          answer: ['th', '{', 'position:', 'sticky;', 'top:', '0;', '}'],
+          alt: [['th', '{', 'top:', '0;', 'position:', 'sticky;', '}']],
+          distractors: ['fixed;', 'bottom:'],
+          hint: 'Sticky plus the edge it should stick to.',
+          explain: 'Each th scrolls normally, then sticks at top: 0 of the scrolling box until the table ends.',
+          preview: {
+            html: '<div style="height:100px;overflow-y:auto;border:1px solid #ccc"><table><tr><th style="background:#eee">Song</th><th style="background:#eee">Time</th></tr><tr><td>Intro</td><td>1:02</td></tr><tr><td>Rise</td><td>3:40</td></tr><tr><td>Fall</td><td>4:12</td></tr><tr><td>Outro</td><td>2:15</td></tr></table></div>',
+          },
+        },
+        {
+          kind: 'fill',
+          prompt: 'The nav never sticks. Type the missing side.',
+          code: '.nav {\n  position: sticky;\n  ___: 0;\n}',
+          blanks: [{ answer: ['top'] }],
+          hint: 'Without an offset, sticky acts like relative.',
+          explain: 'Sticky needs at least one of top, bottom, left or right to know where to stop.',
+          preview: { html: '<div class="nav" style="background:#222;color:#fff;padding:6px">Home · Shop</div><p>One</p><p>Two</p><p>Three</p><p>Four</p><p>Five</p><p>Six</p><p>Seven</p><p>Eight</p><p>Nine</p><p>Ten</p>' },
+        },
+        {
+          kind: 'fix',
+          prompt: 'The header won’t stick. Fix the ancestor’s overflow.',
+          code: '.page {\n  overflow: [[hidden]];\n}\n.page header {\n  position: sticky;\n  top: 0;\n}',
+          fix: 'clip',
+          options: ['clip', 'auto', 'scroll'],
+          hint: 'You want clipping without a new scroll container.',
+          explain: 'hidden makes .page a scroll container, so the header sticks inside .page, which never scrolls. clip doesn’t.',
+          preview: {
+            html: '<div class="page"><header style="background:#222;color:#fff;padding:6px">🛒 Cart</header><p>Socks</p><p>Shoes</p><p>Hat</p><p>Scarf</p><p>Gloves</p><p>Coat</p><p>Belt</p><p>Bag</p><p>Tie</p></div>',
+          },
+        },
+        {
+          kind: 'build',
+          prompt: 'Keep the drawer’s scroll from dragging the page.',
+          answer: ['.drawer', '{', 'overscroll-behavior:', 'contain;', '}'],
+          distractors: ['overflow:', 'clip;'],
+          hint: 'What happens past the end is “over-scroll”.',
+          explain: 'contain stops scroll chaining: when the drawer hits its end, the page behind doesn’t start moving.',
+          preview: { html: '<div class="drawer" style="height:80px;overflow-y:auto;border:1px solid #ccc"><p>Inbox</p><p>Sent</p><p>Drafts</p><p>Spam</p><p>Trash</p></div><div style="height:300px"></div>' },
+        },
+        {
+          kind: 'order',
+          prompt: 'Order: overflow, then scrollbar width, then color.',
+          lines: ['.feed {', '  overflow-y: auto;', '  scrollbar-width: thin;', '  scrollbar-color: teal #eee;', '}'],
+          hint: 'Follow the prompt’s order inside one rule.',
+          explain: 'thin gives a slimmer bar, and scrollbar-color paints the thumb teal on a light gray track.',
+          preview: { html: FEED },
+        },
+        {
+          kind: 'fill',
+          prompt: 'Teal thumb on a light gray track.',
+          code: '.feed {\n  scrollbar-color: ___;\n}',
+          blanks: [{ answer: ['teal #eee'], options: ['teal #eee', '#eee teal'] }],
+          hint: 'The part you drag comes first.',
+          explain: 'scrollbar-color takes the thumb color, then the track color.',
+          preview: { html: `<style>.feed{overflow-y:auto}</style>${FEED}` },
+        },
+        {
+          kind: 'build',
+          prompt: 'Stick the cart total to the bottom of the list.',
+          answer: ['.total', '{', 'position: sticky;', 'bottom:', '0;', '}'],
+          distractors: ['top:', 'position: fixed;'],
+          hint: 'Sticky works on any edge, not just the top.',
+          explain: 'bottom: 0 keeps the total in view at the bottom of the scroller until its real spot scrolls in.',
+          preview: {
+            html: '<div style="height:100px;overflow-y:auto;border:1px solid #ccc"><p>🍎 Apples</p><p>🥖 Bread</p><p>🧀 Cheese</p><p>🥚 Eggs</p><p>🍯 Honey</p><p class="total" style="background:gold;margin:0;padding:4px">Total: $23</p></div>',
+          },
+        },
+      ],
+    },
+    {
+      title: 'Scroll-driven animations',
+      concept: {
+        body: 'animation-timeline: scroll() runs a @keyframes animation by scroll position instead of time; view() runs it as the element moves through the viewport. animation-range picks the stretch, like entry 0% cover 40%. Set the timeline after the animation shorthand, because the shorthand resets it.',
+        code: '.bar {\n  animation: grow linear both;\n  animation-timeline: scroll(root);\n}\n.card {\n  animation: fade-in linear both;\n  animation-timeline: view();\n  animation-range: entry 0% cover 40%;\n}',
+      },
+      exercises: [
+        {
+          kind: 'fill',
+          prompt: 'Type the function that follows the page’s scroll.',
+          code: '.bar {\n  transform-origin: left;\n  animation: grow linear both;\n  animation-timeline: ___(root);\n}\n@keyframes grow { from { transform: scaleX(0); } }',
+          blanks: [{ answer: ['scroll'] }],
+          hint: 'Named after what drives it.',
+          explain: 'scroll(root) ties progress to the page’s scroll: 0% at the top, 100% at the bottom. A reading progress bar!',
+          preview: { html: LONG },
+        },
+        {
+          kind: 'build',
+          prompt: 'Drive the card’s fade by its trip through the viewport.',
+          answer: ['.card', '{', 'animation-timeline:', 'view();', '}'],
+          distractors: ['view;', 'scroll(card);'],
+          hint: 'A function about being seen.',
+          explain: 'view() tracks this element: the animation runs as the card enters, crosses and leaves the visible area.',
+          preview: { html: `<style>@keyframes fade{from{opacity:0}}.card{animation:fade linear both}</style>${LONG}` },
+        },
+        {
+          kind: 'order',
+          prompt: 'Order: origin, animation shorthand, then the timeline.',
+          lines: ['.bar {', '  transform-origin: left;', '  animation: grow linear;', '  animation-timeline: scroll(root);', '}'],
+          hint: 'The shorthand resets the timeline, so the timeline goes after it.',
+          explain: 'The bar grows from the left as the page scrolls. Linear keeps it in step with the scroll.',
+          preview: { html: `<style>@keyframes grow{from{transform:scaleX(0)}}</style>${LONG}` },
+        },
+        {
+          kind: 'fill',
+          prompt: 'Nothing follows the scroll. Which timeline is used?',
+          code: '.card {\n  animation-timeline: view();\n  animation: fade linear both;\n}\n/* Timeline used: ___ */',
+          blanks: [{ answer: ['auto'], options: ['auto', 'view()'] }],
+          hint: 'The animation shorthand comes last and resets things.',
+          explain: 'animation resets animation-timeline to auto, the normal clock. Put the timeline line after the shorthand.',
+        },
+        {
+          kind: 'type',
+          prompt: 'Type the range: from entry 0% to cover 50%.',
+          template: '.card {\n  animation: rise linear both;\n  animation-timeline: view();\n  ___\n}',
+          accept: ['animation-range: entry 0% cover 50%;', 'animation-range: entry 0% cover 50%'],
+          hint: 'animation-range: start-name start% end-name end%.',
+          explain: 'The card animates from first peeking in until it has covered half the trip, then holds its end state.',
+          preview: { html: `<style>@keyframes rise{from{opacity:0;transform:translateY(40px)}}</style>${LONG}` },
+        },
+        {
+          kind: 'type',
+          prompt: 'Type the opening line: only if view() is supported.',
+          template: '___\n  .card { animation-timeline: view(); }\n}',
+          accept: ['@supports (animation-timeline: view()) {', '@supports (animation-timeline: view()){'],
+          hint: '@supports with a full declaration in parentheses.',
+          explain: 'Browsers without scroll-driven animations skip the block, so the card doesn’t run on the clock instead.',
+        },
+        {
+          kind: 'fix',
+          prompt: 'The timeline is invalid. Fix the value.',
+          code: '.reveal {\n  animation: fade linear both;\n  animation-timeline: [[view]];\n}',
+          fix: 'view()',
+          options: ['view()', 'viewport', 'scroll'],
+          hint: 'It’s a function, even with no arguments.',
+          explain: 'view() needs its parentheses. A bare view is invalid (timeline names start with --), so the line is dropped and the animation runs on the clock.',
+          preview: { html: `<style>@keyframes fade{from{opacity:0}}</style>${LONG.replace('class="card"', 'class="reveal"')}` },
+        },
+      ],
+    },
+  ],
+  boss: [
+    {
+      kind: 'fill',
+      prompt: 'Clip the corner badge without breaking sticky inside.',
+      code: '.card {\n  overflow: ___;\n}',
+      blanks: [{ answer: ['clip'], options: ['clip', 'hidden', 'auto'] }],
+      hint: 'Pick the value that makes no scroll container.',
+      explain: 'clip trims overflow without becoming a scroll container, so sticky children still stick to the page.',
+      preview: { html: CARD },
+    },
+    {
+      kind: 'build',
+      prompt: 'Stop anchors hiding under the 4rem header.',
+      answer: ['html', '{', 'scroll-padding-top:', '4rem;', '}'],
+      distractors: ['scroll-margin-top:', 'padding-top:'],
+      hint: 'Set on the scroller, for every target at once.',
+      explain: 'scroll-padding-top on html moves every anchor’s landing spot 4rem down, clear of the header.',
+      preview: { html: PAGE },
+    },
+    {
+      kind: 'type',
+      prompt: 'Type the line: snap sideways, every time.',
+      template: '.slides {\n  overflow-x: auto;\n  ___\n}\n.slide { scroll-snap-align: start; }',
+      accept: ['scroll-snap-type: x mandatory;', 'scroll-snap-type: x mandatory', 'scroll-snap-type: inline mandatory;'],
+      hint: 'Property, axis, strictness.',
+      explain: 'x mandatory always settles on a slide edge once you let go.',
+      preview: { html: SLIDES },
+    },
+    {
+      kind: 'fix',
+      prompt: 'Fast swipes skip cards. Fix the value.',
+      code: '.card {\n  scroll-snap-align: start;\n  scroll-snap-stop: [[normal]];\n}',
+      fix: 'always',
+      options: ['always', 'start', 'mandatory'],
+      hint: 'You want every card to be a forced stop.',
+      explain: 'scroll-snap-stop: always won’t let a single swipe pass a card. normal is the default that allows skipping.',
+    },
+    {
+      kind: 'order',
+      prompt: 'Order: height, overflow, snap type, then the post rule.',
+      lines: ['.feed {', '  height: 100vh;', '  overflow-y: auto;', '  scroll-snap-type: y mandatory;', '}', '.post { scroll-snap-align: start; }'],
+      hint: 'The feed rule comes first and closes before .post.',
+      explain: 'A full-height feed that always rests with one post filling the screen.',
+      preview: { html: FEED },
+    },
+    {
+      kind: 'fix',
+      prompt: 'The range is ignored. Fix the range name.',
+      code: '.card {\n  animation: fade linear both;\n  animation-timeline: view();\n  animation-range: [[enter]] 0% cover 50%;\n}',
+      fix: 'entry',
+      options: ['entry', 'exit', 'start'],
+      hint: 'The names are cover, contain, entry and exit.',
+      explain: 'entry is the stretch where the element is coming into view. enter isn’t a range name, so the line is dropped.',
+      preview: { html: `<style>@keyframes fade{from{opacity:0}}</style>${LONG}` },
+    },
+    {
+      kind: 'fill',
+      prompt: 'Type the value that hides the scrollbar but still scrolls.',
+      code: '.chips {\n  overflow-x: auto;\n  scrollbar-width: ___;\n}',
+      blanks: [{ answer: ['none'] }],
+      hint: 'Thinner than thin.',
+      explain: 'scrollbar-width: none hides the bar, but touch, wheel and keyboard scrolling still work.',
+      preview: { html: '<div class="chips" style="white-space:nowrap;width:200px"><span>🍕 Pizza</span> <span>🍣 Sushi</span> <span>🌮 Tacos</span> <span>🥗 Salad</span> <span>🍜 Ramen</span></div>' },
+    },
+    {
+      kind: 'type',
+      prompt: 'Type the line: modal scroll must not reach the page.',
+      template: '.modal {\n  overflow-y: auto;\n  ___\n}',
+      accept: [
+        'overscroll-behavior: contain;',
+        'overscroll-behavior: contain',
+        'overscroll-behavior-y: contain;',
+        'overscroll-behavior-y: contain',
+        'overscroll-behavior: none;',
+        'overscroll-behavior-y: none;',
+      ],
+      hint: 'Control the over-scroll.',
+      explain: 'contain (or none, which also turns off the bounce) stops scroll chaining, so the page behind the modal stays still.',
+    },
+    {
+      kind: 'fill',
+      prompt: 'How long does the sticky label stick?',
+      code: '.group h3 {\n  position: sticky;\n  top: 0;\n}\n/* h3 sticks until ___ scrolls away */',
+      blanks: [{ answer: ['.group'], options: ['.group', 'the page'] }],
+      hint: 'Sticky never leaves its parent.',
+      explain: 'A sticky box stays inside its containing block, so each label is pushed off when its group ends. Great for A–Z lists.',
+      preview: {
+        html: '<div style="height:120px;overflow-y:auto"><div class="group"><h3 style="background:#eee;margin:0">A</h3><p>Ana</p><p>Alex</p></div><div class="group"><h3 style="background:#eee;margin:0">B</h3><p>Ben</p><p>Bea</p></div></div>',
+      },
+    },
+    {
+      kind: 'build',
+      prompt: 'Run by view, from entry 0% to cover 30%.',
+      answer: ['animation-timeline:', 'view();', 'animation-range:', 'entry', '0%', 'cover', '30%;'],
+      distractors: ['scroll();', 'enter'],
+      hint: 'Timeline first, then the range: start name, %, end name, %.',
+      explain: 'The effect plays while the card slides in and finishes once it has covered 30% of its trip.',
+    },
+  ],
+};
+
+export default unit;

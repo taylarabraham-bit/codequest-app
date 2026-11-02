@@ -1,0 +1,140 @@
+name: Build apps
+
+# Every push to main: run the checks, build the Android APK (phone edition) and
+# the Windows .exe (desktop edition), and publish both in one GitHub Release.
+#
+# BUILD is the run number + 200. Earlier builds reached 104 before this repo
+# started, and the APK's versionCode must keep going up or Android refuses to
+# install the update.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write # create releases
+
+env:
+  BUILD_OFFSET: 200
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: npm
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
+
+      - run: echo "BUILD=$((GITHUB_RUN_NUMBER + BUILD_OFFSET))" >> "$GITHUB_ENV"
+
+      - run: npm ci
+
+      - name: Lint, typecheck, test
+        run: |
+          npm run lint
+          npm run typecheck
+          npm test
+
+      - name: Build web app
+        run: npx vite build
+
+      - name: Sync into Android project
+        run: npx cap sync android
+
+      - name: Decode signing key
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/codequest.keystore"
+
+      - name: Build APK
+        working-directory: android
+        env:
+          BUILD_NUMBER: ${{ env.BUILD }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          export ANDROID_KEYSTORE_PATH="$RUNNER_TEMP/codequest.keystore"
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon --stacktrace
+
+      - name: Rename APK
+        run: cp android/app/build/outputs/apk/release/app-release.apk codequest-${{ env.BUILD }}.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: apk
+          path: codequest-${{ env.BUILD }}.apk
+          if-no-files-found: error
+
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: npm
+
+      - shell: bash
+        run: echo "BUILD=$((GITHUB_RUN_NUMBER + BUILD_OFFSET))" >> "$GITHUB_ENV"
+
+      - run: npm ci
+
+      - name: Build portable .exe
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false' # unsigned: no code-signing certificate
+        run: npm run dist:win
+
+      - name: Rename .exe
+        shell: bash
+        run: cp release/CodeQuest-Desktop-*.exe CodeQuest-Desktop-${{ env.BUILD }}.exe
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: exe
+          path: CodeQuest-Desktop-${{ env.BUILD }}.exe
+          if-no-files-found: error
+
+  release:
+    needs: [apk, windows]
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "BUILD=$((GITHUB_RUN_NUMBER + BUILD_OFFSET))" >> "$GITHUB_ENV"
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: out
+          merge-multiple: true
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ env.BUILD }}
+          name: CodeQuest build ${{ env.BUILD }}
+          make_latest: true
+          body: |
+            **Windows laptop:** download **CodeQuest-Desktop-${{ env.BUILD }}.exe** and double-click it. Nothing to install.
+            The first time, Windows SmartScreen may say "Windows protected your PC" because the app isn't code-signed: click **More info → Run anyway**.
+
+            **Android phone:** download **codequest-${{ env.BUILD }}.apk** on the phone and open it to install or update.
+
+            Commit: ${{ github.sha }}
+          files: out/*
